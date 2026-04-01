@@ -6,10 +6,9 @@ using UnityEngine.UI;
 public class SceneTransitionManager : MonoBehaviour
 {
     public static SceneTransitionManager Instance { get; private set; }
-
     public Image fadeImage;
     public float fadeTime = 0.5f;
-
+    public float holdBlackTime = 0.3f;
     private bool isTransitioning = false;
 
     void Awake()
@@ -18,6 +17,15 @@ public class SceneTransitionManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         SceneManager.sceneLoaded += OnSceneLoaded;
+
+        // จอดำตั้งแต่แรกเลย
+        SetAlpha(1f);
+    }
+
+    void Start()
+    {
+        // ซีนแรกไม่ผ่าน TransitionRoutine ต้อง Snap เองตอนเริ่ม
+        StartCoroutine(SnapOnFirstLoad());
     }
 
     public void GoToScene(string sceneName)
@@ -31,19 +39,65 @@ public class SceneTransitionManager : MonoBehaviour
         isTransitioning = true;
 
         yield return StartCoroutine(Fade(0f, 1f));
-        yield return SceneManager.LoadSceneAsync(sceneName);
-        // OnSceneLoaded จะ snap กล้องให้อัตโนมัติตอนนี้เลย
+
+        AsyncOperation load = SceneManager.LoadSceneAsync(sceneName);
+        load.allowSceneActivation = false;
+
+        while (load.progress < 0.9f)
+            yield return null;
+
+        yield return new WaitForSeconds(holdBlackTime);
+
+        load.allowSceneActivation = true;
+
+        yield return null;
+        yield return null;
+        yield return new WaitForEndOfFrame();
+
+        if (!TrySnapToCurrentZone())
+            SnapCamera();
+
+        yield return new WaitForEndOfFrame();
+
         yield return StartCoroutine(Fade(1f, 0f));
 
         isTransitioning = false;
     }
 
+    bool TrySnapToCurrentZone()
+    {
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player == null) return false;
+
+        CameraZone[] zones = FindObjectsByType<CameraZone>(FindObjectsSortMode.None);
+        foreach (CameraZone zone in zones)
+        {
+            Collider2D col = zone.GetComponent<Collider2D>();
+            if (col != null && col.bounds.Contains(player.transform.position))
+            {
+                CameraFollow cam = FindFirstObjectByType<CameraFollow>();
+                if (cam != null)
+                    cam.SnapToZone(zone.targetOrthographicSize, zone.offset);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void SnapCamera()
+    {
+        CameraFollow cam = FindFirstObjectByType<CameraFollow>();
+        if (cam != null) cam.SnapToTarget();
+    }
+
     IEnumerator Fade(float from, float to)
     {
         if (fadeImage == null) yield break;
-
         float elapsed = 0f;
         Color c = fadeImage.color;
+        c.a = from;
+        fadeImage.color = c;
+
         while (elapsed < fadeTime)
         {
             elapsed += Time.deltaTime;
@@ -51,6 +105,7 @@ public class SceneTransitionManager : MonoBehaviour
             fadeImage.color = c;
             yield return null;
         }
+
         c.a = to;
         fadeImage.color = c;
     }
@@ -66,11 +121,28 @@ public class SceneTransitionManager : MonoBehaviour
         player.isGrappling = false;
         player.isClimbing = false;
         player.canClimb = false;
-
-        // Snap กล้องทันทีตอนจอยังดำอยู่
-        CameraFollow cam = FindFirstObjectByType<CameraFollow>();
-        if (cam != null) cam.SnapToTarget();
     }
+
+    IEnumerator SnapOnFirstLoad()
+    {
+        yield return null;
+        yield return null;
+        yield return new WaitForEndOfFrame();
+
+        if (!TrySnapToCurrentZone())
+            SnapCamera();
+
+        // Snap เสร็จแล้วค่อย fade เปิด
+        yield return StartCoroutine(Fade(1f, 0f));
+    }
+    void SetAlpha(float alpha)
+    {
+        if (fadeImage == null) return;
+        Color c = fadeImage.color;
+        c.a = alpha;
+        fadeImage.color = c;
+    }
+
 
     void OnDestroy()
     {

@@ -1,16 +1,25 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SpawnPoint : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [HideInInspector] public bool isActivated = false;
+    private SpriteRenderer spriteRenderer;
+    private Animator animator;
+
     void Start()
     {
-        
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponentInChildren<Animator>(); // ✅ หาใน Child
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Activate()
     {
-        
+        isActivated = true;
+
+        if (animator != null)
+            animator.SetTrigger("IsTrigger");
+
+        if (animator == null && spriteRenderer != null)
+            spriteRenderer.color = Color.yellow;
     }
 }

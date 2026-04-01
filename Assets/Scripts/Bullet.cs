@@ -25,6 +25,8 @@ public class Bullet : MonoBehaviour
     {
         if (col.CompareTag("Enemy")) return;
         if (col.CompareTag("Bullet")) return;
+        if (col.GetComponent<CameraZone>() != null) return; // 론텍 CameraZone
+        if (col.GetComponent<PlatformTriggerZone>() != null) return; // 론텍 CameraZone
         Destroy(gameObject);
     }
 
