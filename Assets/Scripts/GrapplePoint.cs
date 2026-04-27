@@ -22,6 +22,7 @@ public class GrapplePoint : MonoBehaviour
     private bool isPlayerGrappling = false;
     private bool cancelGrapple = false;
     private float ropeLength;
+    private float originalGravity;
 
     void Start()
     {
@@ -45,11 +46,10 @@ public class GrapplePoint : MonoBehaviour
                 if (!isPlayerGrappling && dist <= grappleRange)
                 {
                     cancelGrapple = false;
-                    ropeLength = dist; // ✅ จำความยาวเชือกตอนเริ่ม
+                    ropeLength = dist;
                     StartCoroutine(PullPlayer());
                 }
 
-                // ✅ เพิ่มแค่นี้ — แกว่งซ้ายขวาด้วย A/D ขณะโหนอยู่
                 if (isPlayerGrappling)
                 {
                     Vector2 toAnchor = (Vector2)transform.position - (Vector2)player.transform.position;
@@ -58,7 +58,6 @@ public class GrapplePoint : MonoBehaviour
                     if (horizontal != 0f)
                         playerRb.AddForce(perpendicular * horizontal * swingForce, ForceMode2D.Force);
 
-                    // ✅ จำกัดความยาวเชือก ให้แกว่งเป็นลูกตุ้ม
                     Vector2 toPlayer = (Vector2)player.transform.position - (Vector2)transform.position;
                     if (toPlayer.magnitude > ropeLength)
                     {
@@ -79,7 +78,6 @@ public class GrapplePoint : MonoBehaviour
         }
         else
         {
-            // ——— โค้ดเดิม ไม่แตะเลย ———
             if (Input.GetKeyDown(KeyCode.E))
             {
                 if (!isPlayerGrappling && dist <= grappleRange)
@@ -101,12 +99,12 @@ public class GrapplePoint : MonoBehaviour
         }
     }
 
-    // ——— Coroutine เดิม ไม่แตะเลย ———
     IEnumerator PullPlayer()
     {
         isPlayerGrappling = true;
         player.isGrappling = true;
-        playerRb.gravityScale = holdToGrapple ? 1f : 0f;
+        originalGravity = playerRb.gravityScale;
+        playerRb.gravityScale = holdToGrapple ? originalGravity : 0f;
         if (lineRenderer != null) lineRenderer.enabled = true;
 
         while (true)
@@ -115,7 +113,6 @@ public class GrapplePoint : MonoBehaviour
             if (dist <= stopDistance) break;
             if (cancelGrapple) break;
 
-            // ✅ ถ้า holdToGrapple = true ไม่ดูด ให้แค่โหนแกว่งอย่างเดียว
             if (!holdToGrapple)
             {
                 Vector2 direction = ((Vector2)transform.position - (Vector2)player.transform.position).normalized;
@@ -127,7 +124,7 @@ public class GrapplePoint : MonoBehaviour
 
         if (lineRenderer != null) lineRenderer.enabled = false;
         playerRb.linearVelocity = Vector2.zero;
-        playerRb.gravityScale = 1f;
+        playerRb.gravityScale = originalGravity;
         player.isGrappling = false;
         isPlayerGrappling = false;
         cancelGrapple = false;

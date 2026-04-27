@@ -1,4 +1,5 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
+
 public class Bullet : MonoBehaviour
 {
     public float speed = 8f;
@@ -16,7 +17,6 @@ public class Bullet : MonoBehaviour
     void Update()
     {
         transform.Translate(Vector2.right * direction * speed * Time.deltaTime);
-
         if (Vector2.Distance(startPos, transform.position) >= range)
             Destroy(gameObject);
     }
@@ -25,8 +25,10 @@ public class Bullet : MonoBehaviour
     {
         if (col.CompareTag("Enemy")) return;
         if (col.CompareTag("Bullet")) return;
-        if (col.GetComponent<CameraZone>() != null) return; // ∑–≈ÿ CameraZone
-        if (col.GetComponent<PlatformTriggerZone>() != null) return; // ∑–≈ÿ CameraZone
+        //if (col.CompareTag("Shield")) return; // ‡πÉ‡∏´‡πâ ShieldCollider ‡∏à‡∏±‡∏î‡∏Å‡∏≤‡∏£‡πÅ‡∏ó‡∏ô
+        if (col.GetComponent<CameraZone>() != null) return;
+        if (col.GetComponent<PlatformTriggerZone>() != null) return;
+
         Destroy(gameObject);
     }
 

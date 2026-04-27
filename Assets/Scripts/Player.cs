@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class Player : MonoBehaviour
 {
@@ -12,29 +12,44 @@ public class Player : MonoBehaviour
     private int currentHealth;
     private bool isDead = false;
     private bool isInvincible = false;
-    public float invincibleDuration = 1.5f; // ÇÔ¹Ò·Õ·Õè¡Ñ¹´ÒàÁ¨ËÅÑ§â´¹µÕ
+    public float invincibleDuration = 1.5f;
+
+    [Header("Ground Check")]
+    public Transform groundCheck;
+    public float groundCheckRadius = 0.1f;
+    public LayerMask groundLayer;
 
     private Rigidbody2D rb;
-    private bool isGrounded;
+    public bool isGrounded;
     private float moveInput;
     private Vector3 originalScale;
 
     public bool isGrappling = false;
     public bool canClimb = false;
     public bool isClimbing = false;
+    private Animator animator;
+    private bool isMovementLocked = false;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         originalScale = transform.localScale;
         currentHealth = maxHealth;
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        if (isDead || isGrappling) return;
+        animator.SetBool("isBlocking", isMovementLocked);
+        if (isDead || isGrappling || isMovementLocked) return;
+
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
         moveInput = Input.GetAxisRaw("Horizontal");
+        animator.SetBool("isWalking", moveInput != 0 && isGrounded);
+        animator.SetBool("isJumping", !isGrounded && !isClimbing && rb.linearVelocity.y > 0);
+        animator.SetBool("isFalling", !isGrounded && !isClimbing && rb.linearVelocity.y < 0);
+        animator.SetBool("isClimbing", isClimbing);
 
         if (canClimb && Input.GetKeyDown(KeyCode.W))
         {
@@ -59,11 +74,10 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (isDead || isGrappling) return;
+        if (isDead || isGrappling || isMovementLocked) return;
 
         if (isClimbing)
         {
-            rb.gravityScale = 0f;
             float climbInput = 0f;
             if (Input.GetKey(KeyCode.W)) climbInput = 1f;
             if (Input.GetKey(KeyCode.S)) climbInput = -1f;
@@ -71,7 +85,6 @@ public class Player : MonoBehaviour
         }
         else
         {
-            rb.gravityScale = 1f;
             rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
         }
     }
@@ -95,18 +108,14 @@ public class Player : MonoBehaviour
     {
         isDead = true;
         rb.linearVelocity = Vector2.zero;
-        rb.gravityScale = 0f;
 
         Debug.Log("Player died!");
 
-        // Respawn ¼èÒ¹ PlayerRespawn
         PlayerRespawn respawn = GetComponent<PlayerRespawn>();
         if (respawn != null)
             respawn.Respawn();
 
-        // Reset state ËÅÑ§ respawn
         currentHealth = maxHealth;
-        rb.gravityScale = 1f;
         isDead = false;
     }
 
@@ -121,29 +130,27 @@ public class Player : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D col)
     {
-        if (col.gameObject.CompareTag("Ground"))
-            isGrounded = true;
-
-        // ª¹ÈÑµÃÙ
         if (col.gameObject.CompareTag("Enemy"))
-            TakeDamage(1);
-    }
+        {
+            // à¸–à¹‰à¸²à¹€à¸«à¸¢à¸µà¸¢à¸šà¸«à¸±à¸§ à¹„à¸¡à¹ˆà¸£à¸±à¸šà¸”à¸²à¹€à¸¡à¸ˆ
+            StompEnemy stomp = col.gameObject.GetComponent<StompEnemy>();
+            Rigidbody2D playerRb = rb;
+            bool isAbove = transform.position.y > col.transform.position.y + 0.2f;
+            bool isFalling = playerRb.linearVelocity.y < 0;
 
-    void OnCollisionExit2D(Collision2D col)
-    {
-        if (col.gameObject.CompareTag("Ground"))
-            isGrounded = false;
+            if (stomp != null && isAbove && isFalling) return; // à¹€à¸«à¸¢à¸µà¸¢à¸šà¸«à¸±à¸§ â†’ à¹„à¸¡à¹ˆà¸£à¸±à¸šà¸”à¸²à¹€à¸¡à¸ˆ
+
+            TakeDamage(1); // à¸Šà¸™à¸”à¹‰à¸²à¸™à¸‚à¹‰à¸²à¸‡ â†’ à¸£à¸±à¸šà¸”à¸²à¹€à¸¡à¸ˆ
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        // áµÐ SpawnPoint
         if (other.TryGetComponent<SpawnPoint>(out SpawnPoint sp))
         {
             SpawnManager.Instance.TryActivate(sp);
         }
 
-        // µ¡ DeathZone
         if (other.CompareTag("DeathZone"))
         {
             currentHealth = 1;
@@ -151,7 +158,20 @@ public class Player : MonoBehaviour
         }
     }
 
-    // àÃÕÂ¡¨Ò¡ÀÒÂ¹Í¡ä´é àªè¹ ¡Ñº´Ñ¡ ¡ÃÐÊØ¹
+    public void SetMovementLocked(bool locked)
+    {
+        isMovementLocked = locked;
+        if (locked)
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+    }
+
     public int GetCurrentHealth() => currentHealth;
     public bool IsDead() => isDead;
+
+    void OnDrawGizmosSelected()
+    {
+        if (groundCheck == null) return;
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+    }
 }

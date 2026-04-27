@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 
 public class CameraZone : MonoBehaviour
 {
@@ -8,14 +8,16 @@ public class CameraZone : MonoBehaviour
 
     void Start()
     {
-        // ‡™Á§µÕπ‡ª‘¥´’π«Ë“ Player Õ¬ŸË„π Zone π’È·≈È«À√◊Õ‡ª≈Ë“
+        // ‡πÄ‡∏ä‡πá‡∏Ñ‡∏ï‡∏≠‡∏ô‡πÄ‡∏õ‡∏¥‡∏î‡∏ã‡∏µ‡∏ô‡∏ß‡πà‡∏≤ Player ‡∏≠‡∏¢‡∏π‡πà‡πÉ‡∏ô Zone ‡∏ô‡∏µ‡πâ‡πÅ‡∏•‡πâ‡∏ß‡∏´‡∏£‡∏∑‡∏≠‡πÄ‡∏õ‡∏•‡πà‡∏≤
         GameObject player = GameObject.FindWithTag("Player");
         if (player == null) return;
 
-        // ∂È“ Player Õ¬ŸË„π Collider π’È·≈È« „ÀÈ Snap ‡≈¬
+        // ‡∏ñ‡πâ‡∏≤ Player ‡∏≠‡∏¢‡∏π‡πà‡πÉ‡∏ô Collider ‡∏ô‡∏µ‡πâ‡πÅ‡∏•‡πâ‡∏ß ‡πÉ‡∏´‡πâ Snap ‡πÄ‡∏•‡∏¢
+
         Collider2D zone = GetComponent<Collider2D>();
         if (zone != null && zone.bounds.Contains(player.transform.position))
         {
+            if (Camera.main == null) return; // ‚úÖ ‡πÄ‡∏û‡∏¥‡πà‡∏°‡∏ï‡∏£‡∏á‡∏ô‡∏µ‡πâ
             CameraFollow cam = Camera.main.GetComponent<CameraFollow>();
             if (cam != null)
                 cam.SnapToZone(targetOrthographicSize, offset);
@@ -36,7 +38,7 @@ public class CameraZone : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        // ‡™Á§«Ë“ºŸÈ‡≈ËπÕ¬ŸË„π Zone Õ◊ËπÕ’°‰À¡
+        // ‡πÄ‡∏ä‡πá‡∏Ñ‡∏ß‡πà‡∏≤‡∏ú‡∏π‡πâ‡πÄ‡∏•‡πà‡∏ô‡∏≠‡∏¢‡∏π‡πà‡πÉ‡∏ô Zone ‡∏≠‡∏∑‡πà‡∏ô‡∏≠‡∏µ‡∏Å‡πÑ‡∏´‡∏°
         CameraZone[] allZones = FindObjectsByType<CameraZone>(FindObjectsSortMode.None);
         foreach (CameraZone zone in allZones)
         {
@@ -44,7 +46,7 @@ public class CameraZone : MonoBehaviour
             Collider2D col = zone.GetComponent<Collider2D>();
             if (col != null && col.bounds.Contains(other.transform.position))
             {
-                // ¬—ßÕ¬ŸË„π Zone Õ◊Ëπ „ÀÈ Zone π—Èπ Override ·∑π
+                // ‡∏¢‡∏±‡∏á‡∏≠‡∏¢‡∏π‡πà‡πÉ‡∏ô Zone ‡∏≠‡∏∑‡πà‡∏ô ‡πÉ‡∏´‡πâ Zone ‡∏ô‡∏±‡πâ‡∏ô Override ‡πÅ‡∏ó‡∏ô
                 CameraFollow cam = Camera.main.GetComponent<CameraFollow>();
                 if (cam != null)
                     cam.SetZone(zone.targetOrthographicSize, zone.offset);
@@ -56,4 +58,6 @@ public class CameraZone : MonoBehaviour
         if (cam2 != null)
             cam2.ResetZone();
     }
+
+
 }

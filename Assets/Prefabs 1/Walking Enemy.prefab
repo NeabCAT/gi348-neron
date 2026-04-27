@@ -91,6 +91,37 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &2230650159396534640
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3533741194561686756}
+  m_Layer: 0
+  m_Name: "\u0E47HeadCheck"
+  m_TagString: Untagged
+  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3533741194561686756
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2230650159396534640}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.97, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6593049034630889270}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5301033668095169333
 GameObject:
   m_ObjectHideFlags: 0
@@ -193,7 +224,8 @@ GameObject:
   - component: {fileID: 6593049034630889270}
   - component: {fileID: 8918630419200456150}
   - component: {fileID: 2417048672915505598}
-  - component: {fileID: 1214154554550406634}
+  - component: {fileID: 1861227371263362698}
+  - component: {fileID: 2764910299558113931}
   m_Layer: 0
   m_Name: Walking Enemy
   m_TagString: Enemy
@@ -216,6 +248,7 @@ Transform:
   m_Children:
   - {fileID: 2340895029673432920}
   - {fileID: 618561439671941732}
+  - {fileID: 3533741194561686756}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8918630419200456150
@@ -259,7 +292,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!61 &1214154554550406634
+--- !u!61 &1861227371263362698
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -289,7 +322,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -305,3 +338,21 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &2764910299558113931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5597188675804749708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6769571009709ad449fa8e193da13b97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyContact
+  stompBounceForce: 8
+  headCheck: {fileID: 3533741194561686756}
+  headCheckRadius: 0.2
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 128

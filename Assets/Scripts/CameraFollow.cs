@@ -31,7 +31,19 @@ public class CameraFollow : MonoBehaviour
     private float currentOffsetSmoothTime;
     private Camera cam;
 
-    void Start()
+    void Awake()
+    {
+        cam = GetComponent<Camera>(); // ✅ Awake ทำงานก่อน Start เสมอ
+        targetOffset = offset;
+        currentOffset = offset;
+        currentZoomSmoothTime = zoomSmoothTime;
+        currentOffsetSmoothTime = offsetSmoothTime;
+
+        float initSize = (startSize > 0f) ? startSize : defaultSize;
+        targetSize = initSize;
+        cam.orthographicSize = initSize;
+    }
+    /*void Start()
     {
         cam = GetComponent<Camera>();
         targetOffset = offset;
@@ -39,11 +51,10 @@ public class CameraFollow : MonoBehaviour
         currentZoomSmoothTime = zoomSmoothTime;
         currentOffsetSmoothTime = offsetSmoothTime;
 
-        // ถ้าตั้ง startSize ไว้ใช้ค่านั้นเลย ไม่ smooth
         float initSize = (startSize > 0f) ? startSize : defaultSize;
         targetSize = initSize;
-        cam.orthographicSize = initSize;    // ← set ทันที ไม่รอ smooth
-    }
+        cam.orthographicSize = initSize;  
+    }*/
 
     void LateUpdate()
     {
