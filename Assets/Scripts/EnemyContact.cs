@@ -1,5 +1,4 @@
-﻿// EnemyContact.cs
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 public class EnemyContact : MonoBehaviour
@@ -10,9 +9,6 @@ public class EnemyContact : MonoBehaviour
     public float headCheckRadius = 0.2f;
     public LayerMask playerLayer;
 
-    [Header("VFX")]
-    public GameObject deathVFXPrefab;
-
     [Header("Death Animation")]
     public string deadAnimationName = "Dead";
 
@@ -21,13 +17,14 @@ public class EnemyContact : MonoBehaviour
 
     void Awake()
     {
-        animator = GetComponentInChildren<Animator>();
+        animator = GetComponent<Animator>();
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>();
     }
 
     void Update()
     {
         if (isDead) return;
-
         Collider2D hit = Physics2D.OverlapCircle(headCheck.position, headCheckRadius, playerLayer);
         if (hit != null)
         {
@@ -40,11 +37,10 @@ public class EnemyContact : MonoBehaviour
         }
     }
 
-    IEnumerator DeathRoutine()
+    public IEnumerator DeathRoutine()
     {
         isDead = true;
 
-        // หยุดการเคลื่อนที่และไม่ให้ gravity ดึง
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
         {
@@ -57,10 +53,7 @@ public class EnemyContact : MonoBehaviour
         if (animator != null)
             animator.SetBool("isDead", true);
 
-        SpawnDeathVFX();
-
         yield return new WaitForSeconds(GetAnimationLength(deadAnimationName));
-
         Destroy(gameObject);
     }
 
@@ -82,13 +75,6 @@ public class EnemyContact : MonoBehaviour
         Player player = col.gameObject.GetComponent<Player>();
         if (player != null)
             player.TakeDamage(player.GetCurrentHealth());
-    }
-
-    void SpawnDeathVFX()
-    {
-        if (deathVFXPrefab == null) return;
-        GameObject vfx = Instantiate(deathVFXPrefab, transform.position, Quaternion.identity);
-        Destroy(vfx, 2f);
     }
 
     void OnDrawGizmosSelected()

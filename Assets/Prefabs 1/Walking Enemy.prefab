@@ -123,10 +123,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyContact
   stompBounceForce: 8
   headCheck: {fileID: 3533741194561686756}
-  headCheckRadius: 0.2
+  headCheckRadius: 0.4
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
+  deadAnimationName: Dead
+  isDead: 0
 --- !u!58 &886660651388622296
 CircleCollider2D:
   m_ObjectHideFlags: 0

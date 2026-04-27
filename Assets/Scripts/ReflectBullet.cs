@@ -23,17 +23,36 @@ public class ReflectBullet : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.CompareTag("Enemy"))
+        HandleHit(col.gameObject);
+    }
+
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        HandleHit(col.gameObject);
+    }
+
+    void HandleHit(GameObject hit)
+    {
+        if (hit.CompareTag("Enemy"))
         {
-            Destroy(col.gameObject); // ฆ่า Enemy ทันที
+            EnemyContact enemyContact = hit.GetComponent<EnemyContact>();
+            if (enemyContact != null && !enemyContact.isDead)
+                enemyContact.StartCoroutine(enemyContact.DeathRoutine());
+            else if (enemyContact == null)
+                Destroy(hit);
+
             Destroy(gameObject);
             return;
         }
 
-        if (col.CompareTag("Bullet")) return;
-        if (col.GetComponent<CameraZone>() != null) return;
-        if (col.GetComponent<PlatformTriggerZone>() != null) return;
+        if (hit.CompareTag("Bullet"))
+        {
+            Destroy(hit);
+            return;
+        }
 
+        if (hit.GetComponent<CameraZone>() != null) return;
+        if (hit.GetComponent<PlatformTriggerZone>() != null) return;
         Destroy(gameObject);
     }
 }
