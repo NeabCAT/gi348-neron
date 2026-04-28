@@ -1,0 +1,120 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8225247674460466857
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1395717544624694591}
+  - component: {fileID: 2000603560998506529}
+  m_Layer: 0
+  m_Name: Freeform Light 2D
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1395717544624694591
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8225247674460466857}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 45.73, y: 12.2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2000603560998506529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8225247674460466857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.2D.Runtime::UnityEngine.Rendering.Universal.Light2D
+  m_ComponentVersion: 2
+  m_LightType: 1
+  m_BlendStyleIndex: 0
+  m_FalloffIntensity: 0.511
+  m_Color: {r: 0.962464, g: 1, b: 0.3443396, a: 1}
+  m_Intensity: 3
+  m_LightVolumeIntensity: 1
+  m_LightVolumeEnabled: 0
+  m_ApplyToSortingLayers: 00000000
+  m_LightCookieSprite: {fileID: 0}
+  m_DeprecatedPointLightCookieSprite: {fileID: 0}
+  m_LightOrder: 0
+  m_AlphaBlendOnOverlap: 0
+  m_OverlapOperation: 0
+  m_NormalMapDistance: 3
+  m_NormalMapQuality: 2
+  m_UseNormalMap: 0
+  m_ShadowsEnabled: 1
+  m_ShadowIntensity: 0.75
+  m_ShadowSoftness: 0.3
+  m_ShadowSoftnessFalloffIntensity: 0.5
+  m_ShadowVolumeIntensityEnabled: 0
+  m_ShadowVolumeIntensity: 0.75
+  m_LocalBounds:
+    m_Center: {x: -0.27770007, y: -0.64399993, z: 0}
+    m_Extent: {x: 3.7656002, y: 3.4966998, z: 0}
+  m_PointLightInnerAngle: 360
+  m_PointLightOuterAngle: 360
+  m_PointLightInnerRadius: 0
+  m_PointLightOuterRadius: 1
+  m_ShapeLightParametricSides: 5
+  m_ShapeLightParametricAngleOffset: 0
+  m_ShapeLightParametricRadius: 1
+  m_ShapeLightFalloffSize: 0.92
+  m_ShapeLightFalloffOffset: {x: 0, y: 0}
+  m_ShapePath:
+  - {x: -1.1462402, y: 0.07749367, z: 0}
+  - {x: -2.0243378, y: -0.20994854, z: 0}
+  - {x: -1.9418373, y: -0.5261946, z: 0}
+  - {x: -2.1618347, y: -0.6224432, z: 0}
+  - {x: -2.1893349, y: -0.91119003, z: 0}
+  - {x: -2.9730759, y: -1.1724377, z: 0}
+  - {x: -3.1243248, y: -1.378685, z: 0}
+  - {x: -3.0143242, y: -1.6399326, z: 0}
+  - {x: -3.0555763, y: -2.1074266, z: 0}
+  - {x: -2.7805786, y: -2.7399197, z: 0}
+  - {x: -2.9455833, y: -3.1936665, z: 0}
+  - {x: -1.5155907, y: -3.2211647, z: 0}
+  - {x: -1.3780975, y: -2.7811708, z: 0}
+  - {x: -1.1993523, y: -2.3824253, z: 0}
+  - {x: -0.7318573, y: -2.189927, z: 0}
+  - {x: -0.16811371, y: -2.341175, z: 0}
+  - {x: 0.43688202, y: -2.162427, z: 0}
+  - {x: 0.47813034, y: -1.8736801, z: 0}
+  - {x: 0.6787491, y: -1.5174885, z: 0}
+  - {x: 1.1518745, y: -1.2411871, z: 0}
+  - {x: 2.4168625, y: -1.2274361, z: 0}
+  - {x: 2.4031143, y: -0.91119003, z: 0}
+  - {x: 2.5681114, y: -0.6361923, z: 0}
+  - {x: 2.5543633, y: -0.19619751, z: 0}
+  - {x: 2.1006165, y: -0.14119816, z: 0}
+  - {x: 1.6743698, y: 0.14754868, z: 0}
+  - {x: 1.5093727, y: 0.50504494, z: 0}
+  - {x: 1.564373, y: 0.7800417, z: 0}
+  - {x: 1.0281296, y: 0.86254025, z: 0}
+  - {x: 0.7256317, y: 1.302536, z: 0}
+  - {x: 0.48625183, y: 1.7924862, z: 0}
+  - {x: -0.11310959, y: 1.935029, z: 0}
+  - {x: -1.0362473, y: 1.7237368, z: 0}
+  - {x: -1.1306305, y: 1.5775251, z: 0}
+  - {x: -1.0343819, y: 1.3712769, z: 0}
+  - {x: -1.0756302, y: 0.93128204, z: 0}
+  - {x: -0.9106331, y: 0.5325365, z: 0}
+  - {x: -1.1306305, y: 0.40878773, z: 0}

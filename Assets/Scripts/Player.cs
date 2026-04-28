@@ -30,6 +30,9 @@ public class Player : MonoBehaviour
     private Animator animator;
     private bool isMovementLocked = false;
 
+    [HideInInspector] public bool climbCanGoUp = false;
+    [HideInInspector] public bool climbCanGoDown = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -82,6 +85,7 @@ public class Player : MonoBehaviour
             if (Input.GetKey(KeyCode.W)) climbInput = 1f;
             if (Input.GetKey(KeyCode.S)) climbInput = -1f;
             rb.linearVelocity = new Vector2(0f, climbInput * climbSpeed);
+            // ไม่แตะ horizontal เลย ปล่อยให้ Ladder จัดการ
         }
         else
         {

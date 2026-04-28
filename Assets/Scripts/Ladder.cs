@@ -6,6 +6,7 @@ public class Ladder : MonoBehaviour
     [Header("Ladder Limits")]
     public Transform topPoint;
     public Transform bottomPoint;
+
     private float originalGravity;
 
     private void OnTriggerEnter2D(Collider2D col)
@@ -18,42 +19,46 @@ public class Ladder : MonoBehaviour
     private void OnTriggerStay2D(Collider2D col)
     {
         if (!col.CompareTag("Player")) return;
+
         Player p = col.GetComponent<Player>();
         Rigidbody2D rb = col.GetComponent<Rigidbody2D>();
+
         p.canClimb = true;
 
+        // ส่งข้อมูล limit ให้ Player ตัดสินใจเอง
         float playerY = col.transform.position.y;
-        bool canMoveUp = playerY < topPoint.position.y;
-        bool canMoveDown = playerY > bottomPoint.position.y;
+        p.climbCanGoUp = playerY < topPoint.position.y;
+        p.climbCanGoDown = playerY > bottomPoint.position.y;
 
-        float verticalInput = 0f;
-        if (Input.GetKey(KeyCode.W) && canMoveUp) verticalInput = 1f;
-        if (Input.GetKey(KeyCode.S) && canMoveDown) verticalInput = -1f;
-
-        if (verticalInput != 0f)
+        // เริ่ม climbing เมื่อกด W/S
+        if (!p.isClimbing)
         {
-            p.isClimbing = true;
-            DisableGroundCollision(col);
-            rb.gravityScale = 0f;
+            bool wantUp = Input.GetKey(KeyCode.W) && p.climbCanGoUp;
+            bool wantDown = Input.GetKey(KeyCode.S) && p.climbCanGoDown;
 
-            float horizontalInput = Input.GetAxisRaw("Horizontal");
-            rb.linearVelocity = new Vector2(horizontalInput * p.moveSpeed, verticalInput * p.climbSpeed);
-        }
-        else if (p.isClimbing)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
+            if (wantUp || wantDown)
+            {
+                p.isClimbing = true;
+                DisableGroundCollision(col);
+                rb.gravityScale = 0f;
+            }
         }
     }
 
     private void OnTriggerExit2D(Collider2D col)
     {
         if (!col.CompareTag("Player")) return;
+
         Player p = col.GetComponent<Player>();
         Rigidbody2D rb = col.GetComponent<Rigidbody2D>();
+
         p.canClimb = false;
         p.isClimbing = false;
-        p.StartCoroutine(RestoreCollision(col)); // ย้ายไปรันที่ Player
+        p.climbCanGoUp = false;
+        p.climbCanGoDown = false;
+
         rb.gravityScale = originalGravity;
+        p.StartCoroutine(RestoreCollision(col));
     }
 
     public void DisableGroundCollision(Collider2D playerCol)
