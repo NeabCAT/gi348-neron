@@ -1,140 +1,239 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class GrapplePoint : MonoBehaviour
 {
-    [Header("Grapple Settings")]
+    [Header("General")]
     public float grappleRange = 5f;
-    public float pullSpeed = 10f;
+
+    [Header("Smooth Pull (Tap Mode)")]
+    public float targetSpeed = 12f;     // ความเร็วตอนดูดเข้า
+    public float steerForce = 5f;       // ความนุ่ม (ยิ่งมากยิ่งตอบสนองไว)
+    public float slowRadius = 2f;       // ระยะที่เริ่มชะลอ
+
+    [Header("Rope Physics")]
+    public float ropeStiffness = 60f;
+    public float swingForce = 10f;
+
+    [Header("Auto Release (Tap Mode)")]
     public float stopDistance = 0.5f;
+    public float maxGrappleTime = 2f;
+    public float minVelocityToKeep = 0.5f;
 
     [Header("Mode")]
-    public bool holdToGrapple = false;
+    public bool holdToGrapple = true; // ✅ ติ๊ก = กดค้าง / ไม่ติ๊ก = กดครั้งเดียว
 
-    [Header("Swing Settings (Hold Mode Only)")]
-    public float swingForce = 5f;
-
-    [Header("Line")]
     public LineRenderer lineRenderer;
 
-    private Player player;
     private Rigidbody2D playerRb;
-    private bool isPlayerGrappling = false;
-    private bool cancelGrapple = false;
+    private Transform player;
+
+    private bool isGrappling = false;
     private float ropeLength;
-    private float originalGravity;
+    private float grappleTimer;
 
     void Start()
     {
-        player = FindObjectOfType<Player>();
-        if (player != null)
-            playerRb = player.GetComponent<Rigidbody2D>();
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        playerRb = player.GetComponent<Rigidbody2D>();
+
+        playerRb.linearDamping = 1f; // 👉 เพิ่มความลื่น
+
         if (lineRenderer != null)
             lineRenderer.enabled = false;
     }
 
     void Update()
     {
-        if (player == null) return;
+        float dist = Vector2.Distance(transform.position, player.position);
 
-        float dist = Vector2.Distance(transform.position, player.transform.position);
-
+        // 🟢 HOLD MODE (กดค้าง)
         if (holdToGrapple)
         {
             if (Input.GetKey(KeyCode.E))
             {
-                if (!isPlayerGrappling && dist <= grappleRange)
+                if (!isGrappling && dist <= grappleRange)
                 {
-                    cancelGrapple = false;
-                    ropeLength = dist;
-                    StartCoroutine(PullPlayer());
-                }
-
-                if (isPlayerGrappling)
-                {
-                    Vector2 toAnchor = (Vector2)transform.position - (Vector2)player.transform.position;
-                    Vector2 perpendicular = new Vector2(toAnchor.y, -toAnchor.x).normalized;
-                    float horizontal = Input.GetAxisRaw("Horizontal");
-                    if (horizontal != 0f)
-                        playerRb.AddForce(perpendicular * horizontal * swingForce, ForceMode2D.Force);
-
-                    Vector2 toPlayer = (Vector2)player.transform.position - (Vector2)transform.position;
-                    if (toPlayer.magnitude > ropeLength)
-                    {
-                        Vector2 constrained = (Vector2)transform.position + toPlayer.normalized * ropeLength;
-                        player.transform.position = constrained;
-                        Vector2 radial = toPlayer.normalized;
-                        float radialVel = Vector2.Dot(playerRb.linearVelocity, radial);
-                        if (radialVel > 0f)
-                            playerRb.linearVelocity -= radial * radialVel;
-                    }
+                    StartGrapple();
                 }
             }
-            else
+
+            if (Input.GetKeyUp(KeyCode.E))
             {
-                if (isPlayerGrappling)
-                    cancelGrapple = true;
+                StopGrapple();
             }
         }
+        // 🔵 TAP MODE (กดครั้งเดียว)
         else
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
-                if (!isPlayerGrappling && dist <= grappleRange)
+                // 🔁 กดซ้ำ = ยกเลิก
+                if (isGrappling)
                 {
-                    cancelGrapple = false;
-                    StartCoroutine(PullPlayer());
+                    StopGrapple();
+                    return;
                 }
-                else if (isPlayerGrappling)
+
+                if (dist <= grappleRange)
                 {
-                    cancelGrapple = true;
+                    StartGrapple();
                 }
             }
         }
 
-        if (isPlayerGrappling && lineRenderer != null)
+        // 🎨 วาดเชือก
+        if (isGrappling && lineRenderer != null)
         {
             lineRenderer.SetPosition(0, transform.position);
-            lineRenderer.SetPosition(1, player.transform.position);
+            lineRenderer.SetPosition(1, player.position);
         }
     }
 
-    IEnumerator PullPlayer()
+    void FixedUpdate()
     {
-        isPlayerGrappling = true;
-        player.isGrappling = true;
-        originalGravity = playerRb.gravityScale;
-        playerRb.gravityScale = holdToGrapple ? originalGravity : 0f;
-        if (lineRenderer != null) lineRenderer.enabled = true;
+        if (!isGrappling) return;
 
-        while (true)
+        grappleTimer += Time.fixedDeltaTime;
+
+        Vector2 anchor = transform.position;
+        Vector2 pos = playerRb.position;
+
+        float dist = Vector2.Distance(anchor, pos);
+
+        // 🎯 TAP MODE: ถึงแล้วปล่อย
+        if (!holdToGrapple && dist <= stopDistance)
         {
-            float dist = Vector2.Distance(transform.position, player.transform.position);
-            if (dist <= stopDistance) break;
-            if (cancelGrapple) break;
-
-            if (!holdToGrapple)
-            {
-                Vector2 direction = ((Vector2)transform.position - (Vector2)player.transform.position).normalized;
-                playerRb.linearVelocity = direction * pullSpeed;
-            }
-
-            yield return null;
+            StopGrapple();
+            return;
         }
 
-        if (lineRenderer != null) lineRenderer.enabled = false;
-        playerRb.linearVelocity = Vector2.zero;
-        playerRb.gravityScale = originalGravity;
-        player.isGrappling = false;
-        isPlayerGrappling = false;
-        cancelGrapple = false;
+        // ⏱️ กันค้าง
+        if (!holdToGrapple && grappleTimer > maxGrappleTime)
+        {
+            StopGrapple();
+            return;
+        }
+
+        // 🐢 ช้าเกิน = ปล่อย
+        if (!holdToGrapple && playerRb.linearVelocity.magnitude < minVelocityToKeep)
+        {
+            StopGrapple();
+            return;
+        }
+
+        Vector2 toPlayer = pos - anchor;
+        if (toPlayer.magnitude == 0) return;
+
+        Vector2 dir = toPlayer.normalized;
+
+        // 🧷 Constraint (กันหลุดวง)
+        float outwardVel = Vector2.Dot(playerRb.linearVelocity, dir);
+        if (dist > ropeLength && outwardVel > 0)
+        {
+            playerRb.linearVelocity -= dir * outwardVel;
+        }
+
+        // 🧲 Tension (เชือกตึง)
+        float stretch = dist - ropeLength;
+        if (stretch > 0)
+        {
+            playerRb.AddForce(-dir * stretch * ropeStiffness);
+        }
+
+        // 🌀 Swing (เฉพาะ hold)
+        if (holdToGrapple)
+        {
+            Vector2 tangent = new Vector2(-dir.y, dir.x);
+            float input = Input.GetAxisRaw("Horizontal");
+            playerRb.AddForce(tangent * input * swingForce);
+        }
+
+        // 🎯 Smooth Pull (แทน impulse/pullForce)
+        if (!holdToGrapple)
+        {
+            float speedMultiplier = Mathf.Clamp01(dist / slowRadius);
+            Vector2 desiredVel = -dir * targetSpeed * speedMultiplier;
+
+            Vector2 steering = desiredVel - playerRb.linearVelocity;
+            playerRb.AddForce(steering * steerForce);
+        }
+    }
+
+    void StartGrapple()
+    {
+        isGrappling = true;
+        grappleTimer = 0f;
+
+        float dist = Vector2.Distance(transform.position, player.position);
+
+        // 🔥 ทำให้ tap “ดูดเข้า”
+        if (!holdToGrapple)
+            ropeLength = dist * 0.7f;
+        else
+            ropeLength = dist;
+
+        if (lineRenderer != null)
+            lineRenderer.enabled = true;
+
+        if (!holdToGrapple)
+        {
+            Vector2 dir = ((Vector2)transform.position - playerRb.position).normalized;
+            playerRb.AddForce(dir * 5f, ForceMode2D.Impulse); // เบา ๆ พอ
+        }
+    }
+
+    void StopGrapple()
+    {
+        if (!isGrappling) return;
+
+        isGrappling = false;
+
+        if (lineRenderer != null)
+            lineRenderer.enabled = false;
     }
 
     void OnDrawGizmosSelected()
     {
+        // 🎯 วงระยะ grapple
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, grappleRange);
+        Gizmos.DrawWireSphere(GetCenter(), grappleRange);
+
+        // 🎯 วง stop distance
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, stopDistance);
+        Gizmos.DrawWireSphere(GetCenter(), stopDistance);
+
+        // 🔲 กริด (ช่วยกะระยะ)
+        DrawGrid(GetCenter(), grappleRange);
+    }
+
+    void DrawGrid(Vector2 center, float size)
+    {
+        Gizmos.color = new Color(1f, 1f, 1f, 0.15f);
+
+        float step = 1f; // 👈 ระยะช่องกริด (ปรับได้)
+
+        for (float x = -size; x <= size; x += step)
+        {
+            Vector2 start = new Vector2(center.x + x, center.y - size);
+            Vector2 end = new Vector2(center.x + x, center.y + size);
+            Gizmos.DrawLine(start, end);
+        }
+
+        for (float y = -size; y <= size; y += step)
+        {
+            Vector2 start = new Vector2(center.x - size, center.y + y);
+            Vector2 end = new Vector2(center.x + size, center.y + y);
+            Gizmos.DrawLine(start, end);
+        }
+    }
+
+    Vector2 GetCenter()
+    {
+        Collider2D col = GetComponent<Collider2D>();
+
+        if (col != null)
+            return col.bounds.center;
+
+        return transform.position;
     }
 }
