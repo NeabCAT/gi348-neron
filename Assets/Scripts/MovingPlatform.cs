@@ -10,21 +10,30 @@ public class MovingPlatform : MonoBehaviour
     public float moveSpeed = 2f;
 
     [Header("Trigger Settings")]
-    public bool isTriggerMove = false; // ถ้าติ๊ก ต้องให้ผู้เล่น trigger ก่อนถึงจะขยับ
+    public bool isTriggerMove = false;
 
     private Vector3 startPos;
+    private Vector3 lastPos;
     private bool isActivated = false;
     private float activatedTime = 0f;
+    private Rigidbody2D rb;
+
+    public Vector3 PlatformVelocity { get; private set; }
 
     void Start()
     {
         startPos = transform.position;
+        lastPos = transform.position;
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void FixedUpdate()
     {
-        // ถ้าเปิด isTriggerMove แต่ยังไม่ถูก trigger ให้หยุดนิ่ง
-        if (isTriggerMove && !isActivated) return;
+        if (isTriggerMove && !isActivated)
+        {
+            PlatformVelocity = Vector3.zero;
+            return;
+        }
 
         float elapsed = isTriggerMove ? (Time.time - activatedTime) : Time.time;
         float pingPong = Mathf.PingPong(elapsed * moveSpeed, moveDistance);
@@ -38,8 +47,11 @@ public class MovingPlatform : MonoBehaviour
             case Direction.Right: offset = Vector3.right * pingPong; break;
         }
 
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        rb.MovePosition(startPos + offset);
+        Vector3 newPos = startPos + offset;
+        PlatformVelocity = (newPos - lastPos) / Time.fixedDeltaTime;
+        lastPos = newPos;
+
+        rb.MovePosition(newPos);
     }
 
     public void Activate()
@@ -47,6 +59,18 @@ public class MovingPlatform : MonoBehaviour
         if (isActivated) return;
         isActivated = true;
         activatedTime = Time.time;
+    }
+
+    private void OnCollisionEnter2D(Collision2D col)
+    {
+        Player p = col.gameObject.GetComponent<Player>();
+        if (p != null) p.SetOnMovingPlatform(true, this);
+    }
+
+    private void OnCollisionExit2D(Collision2D col)
+    {
+        Player p = col.gameObject.GetComponent<Player>();
+        if (p != null) p.SetOnMovingPlatform(false, null);
     }
 
     private void OnDrawGizmos()
