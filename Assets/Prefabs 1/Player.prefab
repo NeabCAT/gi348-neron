@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 7498300945717645641}
   - component: {fileID: 2325343234974820233}
   - component: {fileID: 1085970365792866169}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -35,7 +35,8 @@ Transform:
   m_LocalPosition: {x: -14.34, y: 0.64, z: 0}
   m_LocalScale: {x: 6.218561, y: 6.185723, z: 5.3784223}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 3538514393011657278}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &9038387209105150462
@@ -112,7 +113,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1.5
+  m_GravityScale: 2.5
   m_Material: {fileID: 6200000, guid: dd407f7faf75c4d4f8623c0c32ca45cc, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
@@ -137,13 +138,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   moveSpeed: 5
-  jumpForce: 9
+  jumpForce: 12.5
   climbSpeed: 3
   maxHealth: 3
   invincibleDuration: 1.5
+  groundCheck: {fileID: 3538514393011657278}
+  groundCheckRadius: 0.1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  coyoteTime: 0.15
+  isGrounded: 0
   isGrappling: 0
   canClimb: 0
   isClimbing: 0
+  climbCanGoUp: 0
+  climbCanGoDown: 0
 --- !u!114 &1148886818762868618
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -158,6 +168,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShieldSkill
   shieldPrefab: {fileID: 7005031831980099933, guid: bedad86f943eff243b64696c7afafdf1, type: 3}
   shieldOffset: 1
+  reflectBulletPrefab: {fileID: 7369124763599027577, guid: 623e22256599a8344a94ba8b3b80a91c, type: 3}
+  reflectBulletRange: 3.5
 --- !u!114 &7498300945717645641
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -238,11 +250,60 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 0.07, y: 0.155}
-      - {x: -0.11, y: 0.155}
-      - {x: -0.11, y: -0.155}
-      - {x: 0.06, y: -0.155}
-      - {x: 0.08, y: -0.13499999}
-      - {x: 0.11, y: -0.055}
-      - {x: 0.11, y: 0.114999995}
+    - - {x: 0.01867079, y: 0.14711641}
+      - {x: 0.01992609, y: 0.09140658}
+      - {x: -0.026178325, y: 0.0920466}
+      - {x: -0.07253287, y: 0.14751871}
+      - {x: -0.09217735, y: 0.14639972}
+      - {x: -0.089864, y: -0.026608106}
+      - {x: -0.060494773, y: -0.051265668}
+      - {x: -0.028893856, y: -0.051033452}
+      - {x: -0.031341165, y: -0.07070939}
+      - {x: -0.05251258, y: -0.10807726}
+      - {x: -0.034015756, y: -0.13179675}
+      - {x: -0.030154698, y: -0.15213324}
+      - {x: -0.03186826, y: -0.15681349}
+      - {x: 0.0026262368, y: -0.15606752}
+      - {x: 0.028632032, y: -0.15356663}
+      - {x: 0.031522505, y: -0.12639973}
+      - {x: 0.051120296, y: -0.126777}
+      - {x: 0.056269336, y: -0.110818796}
+      - {x: 0.05757304, y: -0.10483947}
+      - {x: 0.059261527, y: -0.09460451}
+      - {x: 0.060102858, y: -0.087778196}
+      - {x: 0.068651564, y: -0.055716682}
+      - {x: 0.09520313, y: -0.026069738}
+      - {x: 0.09838748, y: 0.067353494}
+      - {x: 0.040135466, y: 0.14725101}
   m_UseDelaunayMesh: 1
+--- !u!1 &8556375919368731636
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3538514393011657278}
+  m_Layer: 0
+  m_Name: GroundCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 419385456094870383, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3538514393011657278
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8556375919368731636}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.1492, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6481149931863184023}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

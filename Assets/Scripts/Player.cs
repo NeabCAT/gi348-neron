@@ -160,7 +160,7 @@ public class Player : MonoBehaviour
 
             if (stomp != null && isAbove && isFalling) return;
 
-            TakeDamage(1);
+            TakeDamage(currentHealth);
         }
     }
 
