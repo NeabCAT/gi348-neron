@@ -1,33 +1,58 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
+using UnityEngine.Audio;
 
 public class CollectiblePlatform : MonoBehaviour
 {
-    // Platform ∑’Ë®–‚º≈ËÕÕ°¡“
     public GameObject platform;
 
-    // µ√«® Õ∫«Ë“‡°Á∫·≈È«À√◊Õ¬—ß
+    [Header("Sound")]
+    public AudioClip collectClip;
+    [Range(0f, 1f)] public float collectVolume = 1f;
+    public AudioMixerGroup sfxMixerGroup;
+
     private bool isCollected = false;
 
     void Start()
     {
-        // ´ËÕπ platform µÕπ‡√‘Ë¡‡°¡
         if (platform != null)
             platform.SetActive(false);
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        // ∂È“ Player ™π°—∫ Object π’È
         if (!isCollected && other.CompareTag("Player"))
         {
-            // ´ËÕπ Object ∑’Ë‡°Á∫
+            isCollected = true;
+
+            // üîä ‡πÄ‡∏™‡∏µ‡∏¢‡∏á‡∏Å‡πà‡∏≠‡∏ô SetActive(false) ‚Äî ‡πÉ‡∏ä‡πâ temp GameObject ‡πÄ‡∏û‡∏£‡∏≤‡∏∞‡∏ï‡∏±‡∏ß‡∏ô‡∏µ‡πâ‡∏Å‡∏≥‡∏•‡∏±‡∏á‡∏à‡∏∞‡∏´‡∏≤‡∏¢
+            PlayCollectSound();
+
             gameObject.SetActive(false);
 
-            // ‚º≈Ë platform
             if (platform != null)
                 platform.SetActive(true);
+        }
+    }
 
-            isCollected = true;
+    void PlayCollectSound()
+    {
+        if (collectClip == null) return;
+
+        if (sfxMixerGroup != null)
+        {
+            GameObject temp = new GameObject("CollectSFX");
+            temp.transform.position = transform.position;
+            AudioSource src = temp.AddComponent<AudioSource>();
+            src.outputAudioMixerGroup = sfxMixerGroup;
+            src.clip = collectClip;
+            src.volume = collectVolume;
+            src.spatialBlend = 0f;
+            src.Play();
+            Destroy(temp, collectClip.length + 0.1f);
+        }
+        else
+        {
+            AudioSource.PlayClipAtPoint(collectClip, transform.position, collectVolume);
         }
     }
 }

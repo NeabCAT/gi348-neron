@@ -2,14 +2,17 @@ using UnityEngine;
 
 public class CollectibleDoor : MonoBehaviour
 {
-    // ประตูที่จะเปิด
     public GameObject door;
-    // ตรวจสอบว่าเก็บแล้วหรือยัง
+
+    [Header("Sound")]
+    public AudioClip collectClip;
+    public AudioClip doorOpenClip;
+    [Range(0f, 1f)] public float volume = 1f;
+
     private bool isCollected = false;
 
     void Start()
     {
-        // ประตูปิดตอนเริ่มเกม
         if (door != null)
             door.SetActive(true);
     }
@@ -18,13 +21,17 @@ public class CollectibleDoor : MonoBehaviour
     {
         if (!isCollected && other.CompareTag("Player"))
         {
-            // ซ่อน Object ที่เก็บ
-            gameObject.SetActive(false);
+            if (collectClip != null)
+                AudioSource.PlayClipAtPoint(collectClip, transform.position, volume);
 
-            // เปิดประตู
             if (door != null)
+            {
+                if (doorOpenClip != null)
+                    AudioSource.PlayClipAtPoint(doorOpenClip, door.transform.position, volume);
                 door.SetActive(false);
+            }
 
+            gameObject.SetActive(false);
             isCollected = true;
         }
     }

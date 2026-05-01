@@ -47,6 +47,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpawnPoint
   isActivated: 0
+  activateClip: {fileID: 8300000, guid: 0f2c689aa364b474791b4de1743b421d, type: 3}
+  respawnClip: {fileID: 0}
+  sfxVolume: 1
+  sfxMixerGroup: {fileID: -5363179356880617498, guid: 140c79862db53964e9c014b2e67f0d4b, type: 2}
 --- !u!61 &5376304600262594433
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -329,7 +333,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 6ef3202ff7e3ad7469a14f41b9a37f34, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -350,7 +354,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -5
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0.12728223, g: 0.20754719, b: 0.11845853, a: 1}

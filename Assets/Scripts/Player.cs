@@ -136,7 +136,9 @@ public class Player : MonoBehaviour
         isGrounded = coyoteTimeCounter > 0f;
 
         // ---- เสียงลงพื้น (Land) ----
-        if (groundedThisFrame && !wasGrounded)
+        if (groundedThisFrame && !wasGrounded
+            && rb.linearVelocity.y < -2f
+            && !isOnMovingPlatform)
             PlaySound(landClip, sfxVolume);
         wasGrounded = groundedThisFrame;
 
