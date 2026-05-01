@@ -33,26 +33,29 @@ public class ReflectBullet : MonoBehaviour
 
     void HandleHit(GameObject hit)
     {
-        if (hit.CompareTag("Enemy"))
+        GameObject root = hit.transform.root.gameObject;
+
+        if (root.CompareTag("Enemy"))
         {
-            EnemyContact enemyContact = hit.GetComponent<EnemyContact>();
+            // หา EnemyContact ทั้งบน root และ child
+            EnemyContact enemyContact = root.GetComponent<EnemyContact>();
+            if (enemyContact == null)
+                enemyContact = root.GetComponentInChildren<EnemyContact>();
+
             if (enemyContact != null && !enemyContact.isDead)
                 enemyContact.StartCoroutine(enemyContact.DeathRoutine());
             else if (enemyContact == null)
-                Destroy(hit);
+                Destroy(root);
 
             Destroy(gameObject);
             return;
         }
 
-        if (hit.CompareTag("Bullet"))
-        {
-            Destroy(hit);
-            return;
-        }
-
+        if (hit.CompareTag("Bullet")) { Destroy(hit); return; }
         if (hit.GetComponent<CameraZone>() != null) return;
         if (hit.GetComponent<PlatformTriggerZone>() != null) return;
+        if (hit.GetComponent<MusicZone>() != null) return;
+
         Destroy(gameObject);
     }
 }

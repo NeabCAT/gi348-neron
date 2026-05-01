@@ -108,6 +108,7 @@ public class EnemyContact : MonoBehaviour
     {
         if (isDead) return;
         if (!col.gameObject.CompareTag("Player")) return;
+        if (col.gameObject.GetComponent<Bullet>() != null) return; // เมิน Bullet
 
         Player player = col.gameObject.GetComponent<Player>();
         if (player != null)

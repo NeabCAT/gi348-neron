@@ -10,6 +10,7 @@ TagManager:
   - DeathZone
   - EnemyBoundary
   - Spawn
+  - MusicZone
   layers:
   - Default
   - TransparentFX
@@ -19,7 +20,7 @@ TagManager:
   - UI
   - Ground
   - Player
-  - 
+  - Enemy
   - 
   - 
   - 

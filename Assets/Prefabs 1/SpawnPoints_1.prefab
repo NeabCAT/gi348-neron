@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpawnPoint
   isActivated: 0
-  activateClip: {fileID: 8300000, guid: 0f2c689aa364b474791b4de1743b421d, type: 3}
+  activateClip: {fileID: 8300000, guid: ab97f8d796cdf384c9f5e95ec276f69f, type: 3}
   respawnClip: {fileID: 0}
   sfxVolume: 1
   sfxMixerGroup: {fileID: -5363179356880617498, guid: 140c79862db53964e9c014b2e67f0d4b, type: 2}

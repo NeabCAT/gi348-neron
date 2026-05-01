@@ -48,6 +48,9 @@ MonoBehaviour:
   flower: {fileID: 0}
   blinkCount: 3
   blinkInterval: 0.2
+  triggerClip: {fileID: 8300000, guid: 3f68f841458bbc4469761b4f0d57e907, type: 3}
+  appearClip: {fileID: 0}
+  volume: 1
 --- !u!61 &5925718102700581419
 BoxCollider2D:
   m_ObjectHideFlags: 0

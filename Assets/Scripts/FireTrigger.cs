@@ -7,6 +7,11 @@ public class FireTrigger : MonoBehaviour
     public int blinkCount = 3;
     public float blinkInterval = 0.2f;
 
+    [Header("Sound")]
+    public AudioClip triggerClip;   // เสียงตอนเหยียบ trigger
+    public AudioClip appearClip;    // เสียงตอน flower โผล่สมบูรณ์
+    [Range(0f, 1f)] public float volume = 1f;
+
     private bool triggered = false;
 
     void Start()
@@ -18,6 +23,10 @@ public class FireTrigger : MonoBehaviour
     {
         if (triggered || !other.CompareTag("Player")) return;
         triggered = true;
+
+        if (triggerClip != null)
+            AudioSource.PlayClipAtPoint(triggerClip, transform.position, volume);
+
         StartCoroutine(Blink());
     }
 
@@ -32,6 +41,10 @@ public class FireTrigger : MonoBehaviour
         }
 
         flower.SetActive(true);
+
+        if (appearClip != null)
+            AudioSource.PlayClipAtPoint(appearClip, flower.transform.position, volume);
+
         Destroy(gameObject);
     }
 }

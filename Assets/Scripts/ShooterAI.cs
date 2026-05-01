@@ -95,7 +95,7 @@ public class ShooterAI : MonoBehaviour
             animator.SetBool("isShooting", false);
 
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
-        bullet.GetComponent<Bullet>().Init(dir > 0 ? 1 : -1, shootRange);
+        bullet.GetComponent<Bullet>().Init(dir > 0 ? 1 : -1, shootRange, gameObject);
 
         // 🔊 เสียงยิง
         if (shootClip != null)

@@ -12,6 +12,7 @@ public class EnemyKillPlayer : MonoBehaviour
         {
             // ถ้าชนจากด้านบน = เหยียบหัว ไม่ตาย
             if (contact.normal.y > 0.5f) return;
+            if (col.gameObject.GetComponent<Bullet>() != null) return; // เมิน Bullet
         }
 
         // ชนด้านข้างหรือด้านล่าง = ตายทันที
