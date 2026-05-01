@@ -403310,6 +403310,7 @@ GameObject:
   - component: {fileID: 1389535582}
   - component: {fileID: 1389535581}
   - component: {fileID: 1389535580}
+  - component: {fileID: 1389535583}
   m_Layer: 0
   m_Name: Water
   m_TagString: DeathZone
@@ -403363,7 +403364,7 @@ TilemapCollider2D:
     serializedVersion: 2
     m_Bits: 4294967295
   m_IsTrigger: 1
-  m_UsedByEffector: 0
+  m_UsedByEffector: 1
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
@@ -442341,6 +442342,26 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!253 &1389535583
+BuoyancyEffector2D:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1389535578}
+  m_Enabled: 1
+  m_UseColliderMask: 1
+  m_ColliderMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_SurfaceLevel: 0
+  m_Density: 2
+  m_LinearDamping: 5
+  m_AngularDamping: 5
+  m_FlowAngle: 0
+  m_FlowMagnitude: 0
+  m_FlowVariation: 0
 --- !u!1001 &1394420629
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -455366,7 +455387,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6481149931863184023, guid: 3497f91a84a0a454a8579ee3d89a1d13, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.54
+      value: 0.417
       objectReference: {fileID: 0}
     - target: {fileID: 6481149931863184023, guid: 3497f91a84a0a454a8579ee3d89a1d13, type: 3}
       propertyPath: m_LocalPosition.z

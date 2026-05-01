@@ -77,6 +77,7 @@ public class Player : MonoBehaviour
     public bool isClimbing = false;
     private Animator animator;
     private bool isMovementLocked = false;
+    private float _originalGravityScale;
 
     [HideInInspector] public bool climbCanGoUp = false;
     [HideInInspector] public bool climbCanGoDown = false;
@@ -318,23 +319,15 @@ public class Player : MonoBehaviour
         isDead = true;
         rb.linearVelocity = Vector2.zero;
 
+        _originalGravityScale = rb.gravityScale; // ✅ เก็บค่าเดิมไว้ก่อน
+        rb.gravityScale = 0f;
+        rb.constraints = RigidbodyConstraints2D.FreezeAll;
+
         PlaySound(deathClip, sfxVolume);
+        animator.SetTrigger("isDead");
+
         Debug.Log("Player died!");
-
-        // Destroy FlyingEnemy ทุกตัวในแมพ
-        foreach (FlyingEnemy enemy in FindObjectsByType<FlyingEnemy>(FindObjectsSortMode.None))
-            Destroy(enemy.gameObject);
-
-        PlayerRespawn respawn = GetComponent<PlayerRespawn>();
-        if (respawn != null)
-            respawn.Respawn();
-
-        // snap กล้องไปที่ player หลัง respawn ทันที
-        CameraFollow cam = FindFirstObjectByType<CameraFollow>();
-        if (cam != null) cam.SnapToTarget();
-
-        currentHealth = maxHealth;
-        isDead = false;
+        StartCoroutine(DieCoroutine());
     }
 
     IEnumerator InvincibleCoroutine()
@@ -395,5 +388,44 @@ public class Player : MonoBehaviour
         if (groundCheck == null) return;
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(groundCheck.position, groundCheckRadius);
+    }
+
+    IEnumerator DieCoroutine()
+    {
+        // ✅ เลื่อนลง -0.5 ทีละนิด
+        float dropAmount = 0.5f;
+        float dropDuration = 0.3f;
+        float elapsed = 0f;
+        Vector3 startPos = transform.position;
+        Vector3 targetPos = startPos + new Vector3(0f, -dropAmount, 0f);
+
+        while (elapsed < dropDuration)
+        {
+            transform.position = Vector3.Lerp(startPos, targetPos, elapsed / dropDuration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = targetPos;
+
+        // รอ animation เล่นจบ
+        yield return new WaitForSeconds(1.2f);
+
+        // ✅ คืนค่ากลับก่อน Respawn
+        rb.gravityScale = _originalGravityScale;
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        transform.position = startPos; // กลับตำแหน่งเดิมก่อน Respawn จัดการ
+
+        foreach (FlyingEnemy enemy in FindObjectsByType<FlyingEnemy>(FindObjectsSortMode.None))
+            Destroy(enemy.gameObject);
+
+        PlayerRespawn respawn = GetComponent<PlayerRespawn>();
+        if (respawn != null)
+            respawn.Respawn();
+
+        CameraFollow cam = FindFirstObjectByType<CameraFollow>();
+        if (cam != null) cam.SnapToTarget();
+
+        currentHealth = maxHealth;
+        isDead = false;
     }
 }
