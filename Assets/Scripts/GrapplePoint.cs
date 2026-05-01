@@ -6,9 +6,9 @@ public class GrapplePoint : MonoBehaviour
     public float grappleRange = 5f;
 
     [Header("Smooth Pull (Tap Mode)")]
-    public float targetSpeed = 12f;     // ความเร็วตอนดูดเข้า
-    public float steerForce = 5f;       // ความนุ่ม (ยิ่งมากยิ่งตอบสนองไว)
-    public float slowRadius = 2f;       // ระยะที่เริ่มชะลอ
+    public float targetSpeed = 12f;
+    public float steerForce = 5f;
+    public float slowRadius = 2f;
 
     [Header("Rope Physics")]
     public float ropeStiffness = 60f;
@@ -20,12 +20,13 @@ public class GrapplePoint : MonoBehaviour
     public float minVelocityToKeep = 0.5f;
 
     [Header("Mode")]
-    public bool holdToGrapple = true; // ✅ ติ๊ก = กดค้าง / ไม่ติ๊ก = กดครั้งเดียว
+    public bool holdToGrapple = true;
 
     public LineRenderer lineRenderer;
 
     private Rigidbody2D playerRb;
     private Transform player;
+    private Player playerScript;       // << เพิ่ม reference ไป Player
 
     private bool isGrappling = false;
     private float ropeLength;
@@ -35,8 +36,9 @@ public class GrapplePoint : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
         playerRb = player.GetComponent<Rigidbody2D>();
+        playerScript = player.GetComponent<Player>();  // << เก็บ reference
 
-        playerRb.linearDamping = 1f; // 👉 เพิ่มความลื่น
+        playerRb.linearDamping = 1f;
 
         if (lineRenderer != null)
             lineRenderer.enabled = false;
@@ -46,28 +48,23 @@ public class GrapplePoint : MonoBehaviour
     {
         float dist = Vector2.Distance(transform.position, player.position);
 
-        // 🟢 HOLD MODE (กดค้าง)
+        // 🟢 HOLD MODE
         if (holdToGrapple)
         {
             if (Input.GetKey(KeyCode.E))
             {
                 if (!isGrappling && dist <= grappleRange)
-                {
                     StartGrapple();
-                }
             }
 
             if (Input.GetKeyUp(KeyCode.E))
-            {
                 StopGrapple();
-            }
         }
-        // 🔵 TAP MODE (กดครั้งเดียว)
+        // 🔵 TAP MODE
         else
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
-                // 🔁 กดซ้ำ = ยกเลิก
                 if (isGrappling)
                 {
                     StopGrapple();
@@ -75,13 +72,10 @@ public class GrapplePoint : MonoBehaviour
                 }
 
                 if (dist <= grappleRange)
-                {
                     StartGrapple();
-                }
             }
         }
 
-        // 🎨 วาดเชือก
         if (isGrappling && lineRenderer != null)
         {
             lineRenderer.SetPosition(0, transform.position);
@@ -97,24 +91,22 @@ public class GrapplePoint : MonoBehaviour
 
         Vector2 anchor = transform.position;
         Vector2 pos = playerRb.position;
-
         float dist = Vector2.Distance(anchor, pos);
 
-        // 🎯 TAP MODE: ถึงแล้วปล่อย
         if (!holdToGrapple && dist <= stopDistance)
         {
+            // สลิงถึงจุด — เล่นเสียง attach แล้วปล่อย
+            playerScript?.OnGrappleAttach();
             StopGrapple();
             return;
         }
 
-        // ⏱️ กันค้าง
         if (!holdToGrapple && grappleTimer > maxGrappleTime)
         {
             StopGrapple();
             return;
         }
 
-        // 🐢 ช้าเกิน = ปล่อย
         if (!holdToGrapple && playerRb.linearVelocity.magnitude < minVelocityToKeep)
         {
             StopGrapple();
@@ -126,21 +118,14 @@ public class GrapplePoint : MonoBehaviour
 
         Vector2 dir = toPlayer.normalized;
 
-        // 🧷 Constraint (กันหลุดวง)
         float outwardVel = Vector2.Dot(playerRb.linearVelocity, dir);
         if (dist > ropeLength && outwardVel > 0)
-        {
             playerRb.linearVelocity -= dir * outwardVel;
-        }
 
-        // 🧲 Tension (เชือกตึง)
         float stretch = dist - ropeLength;
         if (stretch > 0)
-        {
             playerRb.AddForce(-dir * stretch * ropeStiffness);
-        }
 
-        // 🌀 Swing (เฉพาะ hold)
         if (holdToGrapple)
         {
             Vector2 tangent = new Vector2(-dir.y, dir.x);
@@ -148,12 +133,10 @@ public class GrapplePoint : MonoBehaviour
             playerRb.AddForce(tangent * input * swingForce);
         }
 
-        // 🎯 Smooth Pull (แทน impulse/pullForce)
         if (!holdToGrapple)
         {
             float speedMultiplier = Mathf.Clamp01(dist / slowRadius);
             Vector2 desiredVel = -dir * targetSpeed * speedMultiplier;
-
             Vector2 steering = desiredVel - playerRb.linearVelocity;
             playerRb.AddForce(steering * steerForce);
         }
@@ -166,7 +149,6 @@ public class GrapplePoint : MonoBehaviour
 
         float dist = Vector2.Distance(transform.position, player.position);
 
-        // 🔥 ทำให้ tap “ดูดเข้า”
         if (!holdToGrapple)
             ropeLength = dist * 0.7f;
         else
@@ -178,8 +160,11 @@ public class GrapplePoint : MonoBehaviour
         if (!holdToGrapple)
         {
             Vector2 dir = ((Vector2)transform.position - playerRb.position).normalized;
-            playerRb.AddForce(dir * 5f, ForceMode2D.Impulse); // เบา ๆ พอ
+            playerRb.AddForce(dir * 5f, ForceMode2D.Impulse);
         }
+
+        // 🔊 เสียงยิงสลิง
+        playerScript?.OnGrappleStart();
     }
 
     void StopGrapple()
@@ -190,50 +175,37 @@ public class GrapplePoint : MonoBehaviour
 
         if (lineRenderer != null)
             lineRenderer.enabled = false;
+
+        // 🔊 เสียงปล่อยสลิง
+        playerScript?.OnGrappleStop();
     }
 
     void OnDrawGizmosSelected()
     {
-        // 🎯 วงระยะ grapple
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(GetCenter(), grappleRange);
 
-        // 🎯 วง stop distance
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(GetCenter(), stopDistance);
 
-        // 🔲 กริด (ช่วยกะระยะ)
         DrawGrid(GetCenter(), grappleRange);
     }
 
     void DrawGrid(Vector2 center, float size)
     {
         Gizmos.color = new Color(1f, 1f, 1f, 0.15f);
-
-        float step = 1f; // 👈 ระยะช่องกริด (ปรับได้)
+        float step = 1f;
 
         for (float x = -size; x <= size; x += step)
-        {
-            Vector2 start = new Vector2(center.x + x, center.y - size);
-            Vector2 end = new Vector2(center.x + x, center.y + size);
-            Gizmos.DrawLine(start, end);
-        }
+            Gizmos.DrawLine(new Vector2(center.x + x, center.y - size), new Vector2(center.x + x, center.y + size));
 
         for (float y = -size; y <= size; y += step)
-        {
-            Vector2 start = new Vector2(center.x - size, center.y + y);
-            Vector2 end = new Vector2(center.x + size, center.y + y);
-            Gizmos.DrawLine(start, end);
-        }
+            Gizmos.DrawLine(new Vector2(center.x - size, center.y + y), new Vector2(center.x + size, center.y + y));
     }
 
     Vector2 GetCenter()
     {
         Collider2D col = GetComponent<Collider2D>();
-
-        if (col != null)
-            return col.bounds.center;
-
-        return transform.position;
+        return col != null ? (Vector2)col.bounds.center : (Vector2)transform.position;
     }
 }

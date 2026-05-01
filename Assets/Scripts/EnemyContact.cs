@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class EnemyContact : MonoBehaviour
 {
@@ -11,6 +12,11 @@ public class EnemyContact : MonoBehaviour
 
     [Header("Death Animation")]
     public string deadAnimationName = "Dead";
+
+    [Header("Sound - Stomp")]
+    public AudioClip stompClip;              // เสียงตอนโดน stomp
+    [Range(0f, 1f)] public float stompVolume = 1f;
+    public AudioMixerGroup sfxMixerGroup;    // ลาก SFX Group ตัวเดิมใส่
 
     private Animator animator;
     public bool isDead = false;
@@ -25,6 +31,7 @@ public class EnemyContact : MonoBehaviour
     void Update()
     {
         if (isDead) return;
+
         Collider2D hit = Physics2D.OverlapCircle(headCheck.position, headCheckRadius, playerLayer);
         if (hit != null)
         {
@@ -40,6 +47,9 @@ public class EnemyContact : MonoBehaviour
     public IEnumerator DeathRoutine()
     {
         isDead = true;
+
+        // 🔊 เสียง stomp — ใช้ PlayClipAtPoint เพราะ GameObject กำลังจะ Destroy
+        PlayStompSound();
 
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
@@ -57,6 +67,32 @@ public class EnemyContact : MonoBehaviour
         Destroy(gameObject);
     }
 
+    void PlayStompSound()
+    {
+        if (stompClip == null) return;
+
+        // PlayClipAtPoint สร้าง AudioSource ชั่วคราวที่ตำแหน่ง enemy
+        // และ destroy ตัวเองหลังเสียงจบ — ไม่ขึ้นกับ GameObject นี้
+        if (sfxMixerGroup != null)
+        {
+            // ถ้าต้องการให้ผ่าน Mixer ต้องสร้าง AudioSource temp เอง
+            GameObject temp = new GameObject("StompSFX");
+            temp.transform.position = transform.position;
+            AudioSource src = temp.AddComponent<AudioSource>();
+            src.outputAudioMixerGroup = sfxMixerGroup;
+            src.clip = stompClip;
+            src.volume = stompVolume;
+            src.spatialBlend = 0f;   // 2D sound
+            src.Play();
+            Destroy(temp, stompClip.length + 0.1f);
+        }
+        else
+        {
+            // fallback: ไม่มี Mixer ก็ยังเล่นได้
+            AudioSource.PlayClipAtPoint(stompClip, transform.position, stompVolume);
+        }
+    }
+
     float GetAnimationLength(string animName)
     {
         if (animator == null) return 0.5f;
@@ -72,6 +108,7 @@ public class EnemyContact : MonoBehaviour
     {
         if (isDead) return;
         if (!col.gameObject.CompareTag("Player")) return;
+
         Player player = col.gameObject.GetComponent<Player>();
         if (player != null)
             player.TakeDamage(player.GetCurrentHealth());

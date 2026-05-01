@@ -148,6 +148,46 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   coyoteTime: 0.15
+  footstepClips:
+  - {fileID: 8300000, guid: f6e95f539c4613b4c814fef5ed748e7a, type: 3}
+  - {fileID: 8300000, guid: d76ac61c32fc36240a1fb2fdca376f4f, type: 3}
+  - {fileID: 8300000, guid: 02057d39141710e47a3caf158258210e, type: 3}
+  - {fileID: 8300000, guid: 54d0417b9c1c1a245bd8ef3f0f7103f6, type: 3}
+  - {fileID: 8300000, guid: f39da0ca079e3344f996d6fb7c7951c3, type: 3}
+  - {fileID: 8300000, guid: 1a164d38a58dd404ab296678e5eae34b, type: 3}
+  - {fileID: 8300000, guid: 67f29080eccd1c64faf906c4a5f7b664, type: 3}
+  - {fileID: 8300000, guid: 5929fa4cb4568444caee3e9006a92cfa, type: 3}
+  - {fileID: 8300000, guid: 2d3491a9f41a99a448521810b308404c, type: 3}
+  - {fileID: 8300000, guid: bdc90e7737b4f6445831dd46c0cacbe7, type: 3}
+  - {fileID: 8300000, guid: a193f9ff27e9f53469cd129975f6d296, type: 3}
+  - {fileID: 8300000, guid: d9e4f2af6185fe549bce636e0b216add, type: 3}
+  - {fileID: 8300000, guid: cf6af8803ea72774e8d2b66022113de1, type: 3}
+  - {fileID: 8300000, guid: 2a3f94e4a4032f74295c975b3de42c19, type: 3}
+  - {fileID: 8300000, guid: d602f81a34d25fb4b9a9bcff6786959e, type: 3}
+  - {fileID: 8300000, guid: 951de1088826f9b4888a70fcecd69d64, type: 3}
+  - {fileID: 8300000, guid: b7313f41a386dd34ba379940262de5b1, type: 3}
+  - {fileID: 8300000, guid: a2d8a44390e4d5645b3764ae6540bb20, type: 3}
+  - {fileID: 8300000, guid: fefce2cd5567d1248aeeb4adfd3b40fc, type: 3}
+  - {fileID: 8300000, guid: 036e0a878b050a14199a2ba8602bc1bd, type: 3}
+  footstepInterval: 0.35
+  jumpClip: {fileID: 8300000, guid: fe27df6679085cb4099eb62e45d4c358, type: 3}
+  landClip: {fileID: 8300000, guid: f73343466198d5843b2bc72f5e261eab, type: 3}
+  climbStepClips:
+  - {fileID: 8300000, guid: 6b41d33a9f233124cb2312918db7cf9e, type: 3}
+  climbStepInterval: 0.4
+  grappleShootClip: {fileID: 8300000, guid: f91899fcb41a3a84abff4a7050bb73a0, type: 3}
+  grappleAttachClip: {fileID: 0}
+  grappleReleaseClip: {fileID: 0}
+  blockStartClip: {fileID: 8300000, guid: 2976c993fd54f8144a66ed44a942a8c6, type: 3}
+  blockEndClip: {fileID: 0}
+  hurtClip: {fileID: 0}
+  deathClip: {fileID: 0}
+  sfxSource: {fileID: 0}
+  loopSource: {fileID: 0}
+  sfxMixerGroup: {fileID: -5363179356880617498, guid: 140c79862db53964e9c014b2e67f0d4b, type: 2}
+  footstepVolume: 0.5
+  climbVolume: 0.5
+  sfxVolume: 1
   isGrounded: 0
   isGrappling: 0
   canClimb: 0

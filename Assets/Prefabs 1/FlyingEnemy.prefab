@@ -202,9 +202,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30fa9fcad3fded54f86a7f29b6b7afe4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlyingEnemy
-  flySpeed: 4.5
+  flySpeed: 5.5
   spawnDuration: 1.5
   destroyStateName: isDestroy
+  spawnClip: {fileID: 8300000, guid: 7c4663f220e5ca2459bc23a9249b43e5, type: 3}
+  flyLoopClip: {fileID: 0}
+  destroyClip: {fileID: 8300000, guid: bfaa4ded7196d1c49b99d2ff633dcab5, type: 3}
+  sfxVolume: 1
+  sfxMixerGroup: {fileID: 0}
+  soundMinDistance: 2
+  soundMaxDistance: 8
 --- !u!95 &3696381231455255036
 Animator:
   serializedVersion: 7

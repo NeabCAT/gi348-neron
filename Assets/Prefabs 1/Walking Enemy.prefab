@@ -83,6 +83,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MonsterAI
   patrolDistance: 6.3
   moveSpeed: 3
+  footstepClips:
+  - {fileID: 8300000, guid: 7a826f6b66ddef44f9c2f3b3d6741dc6, type: 3}
+  footstepVolume: 1
+  footstepInterval: 0.4
+  sfxMixerGroup: {fileID: -5363179356880617498, guid: 140c79862db53964e9c014b2e67f0d4b, type: 2}
+  soundMinDistance: 2
+  soundMaxDistance: 8
 --- !u!50 &2417048672915505598
 Rigidbody2D:
   serializedVersion: 5
@@ -129,6 +136,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   deadAnimationName: Dead
+  stompClip: {fileID: 8300000, guid: 03e60f492e8e8eb489527ad279d891c0, type: 3}
+  stompVolume: 0.5
+  sfxMixerGroup: {fileID: -5363179356880617498, guid: 140c79862db53964e9c014b2e67f0d4b, type: 2}
   isDead: 0
 --- !u!58 &886660651388622296
 CircleCollider2D:

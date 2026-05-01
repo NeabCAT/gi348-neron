@@ -17,14 +17,11 @@ public class SceneTransitionManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         SceneManager.sceneLoaded += OnSceneLoaded;
-
-        // จอดำตั้งแต่แรกเลย
         SetAlpha(1f);
     }
 
     void Start()
     {
-        // ซีนแรกไม่ผ่าน TransitionRoutine ต้อง Snap เองตอนเริ่ม
         StartCoroutine(SnapOnFirstLoad());
     }
 
@@ -90,7 +87,8 @@ public class SceneTransitionManager : MonoBehaviour
         if (cam != null) cam.SnapToTarget();
     }
 
-    IEnumerator Fade(float from, float to)
+    // เปลี่ยนเป็น public เพื่อให้ TeleportZone เรียกใช้ได้
+    public IEnumerator Fade(float from, float to)
     {
         if (fadeImage == null) yield break;
         float elapsed = 0f;
@@ -108,6 +106,10 @@ public class SceneTransitionManager : MonoBehaviour
 
         c.a = to;
         fadeImage.color = c;
+
+        // ปิด raycast ตอน fade หาย เปิดตอน fade มืด
+        if (fadeImage.TryGetComponent<UnityEngine.UI.Graphic>(out var graphic))
+            graphic.raycastTarget = (to > 0.01f);
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -132,9 +134,9 @@ public class SceneTransitionManager : MonoBehaviour
         if (!TrySnapToCurrentZone())
             SnapCamera();
 
-        // Snap เสร็จแล้วค่อย fade เปิด
         yield return StartCoroutine(Fade(1f, 0f));
     }
+
     void SetAlpha(float alpha)
     {
         if (fadeImage == null) return;
@@ -142,7 +144,6 @@ public class SceneTransitionManager : MonoBehaviour
         c.a = alpha;
         fadeImage.color = c;
     }
-
 
     void OnDestroy()
     {

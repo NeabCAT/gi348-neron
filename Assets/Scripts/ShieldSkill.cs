@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ShieldSkill : MonoBehaviour
 {
@@ -9,6 +9,9 @@ public class ShieldSkill : MonoBehaviour
     [Header("Reflect Settings")]
     public GameObject reflectBulletPrefab;
     public float reflectBulletRange = 15f;
+
+    [Header("Sound - Shield")]
+    public AudioClip reflectShootClip;   // เสียงตอน Reflect Bullet ออก
 
     private GameObject currentShield;
     private Player player;
@@ -26,12 +29,11 @@ public class ShieldSkill : MonoBehaviour
         if (Input.GetKey(KeyCode.F) && player.isGrounded)
         {
             isBlocking = true;
-
             if (currentShield == null)
             {
                 currentShield = Instantiate(shieldPrefab);
                 ShieldCollider sc = currentShield.GetComponent<ShieldCollider>();
-                if (sc != null) sc.Init(this); // �� reference ��� ShieldCollider
+                if (sc != null) sc.Init(this);
             }
 
             float dir = Mathf.Sign(transform.localScale.x);
@@ -45,13 +47,11 @@ public class ShieldSkill : MonoBehaviour
         else
         {
             isBlocking = false;
-
             if (currentShield != null)
             {
                 Destroy(currentShield);
                 currentShield = null;
             }
-
             if (player != null)
                 player.SetMovementLocked(false);
         }
@@ -68,13 +68,16 @@ public class ShieldSkill : MonoBehaviour
         ReflectBullet rb = bullet.GetComponent<ReflectBullet>();
         if (rb != null)
             rb.Init(dir, reflectBulletRange);
+
+        // 🔊 เสียง Reflect Bullet ผ่าน SFX Mixer ของ Player
+        if (player != null && reflectShootClip != null)
+            player.sfxSource.PlayOneShot(reflectShootClip, player.sfxVolume);
     }
 
     void OnDestroy()
     {
         if (currentShield != null)
             Destroy(currentShield);
-
         if (player != null)
             player.SetMovementLocked(false);
     }

@@ -25,9 +25,16 @@ public class Bullet : MonoBehaviour
     {
         if (col.CompareTag("Enemy")) return;
         if (col.CompareTag("Bullet")) return;
-        //if (col.CompareTag("Shield")) return; // ให้ ShieldCollider จัดการแทน
         if (col.GetComponent<CameraZone>() != null) return;
         if (col.GetComponent<PlatformTriggerZone>() != null) return;
+
+        // ✅ ถ้าชน Player → ตายทันที
+        if (col.CompareTag("Player"))
+        {
+            Player player = col.GetComponent<Player>();
+            if (player != null)
+                player.TakeDamage(player.GetCurrentHealth());
+        }
 
         Destroy(gameObject);
     }
@@ -36,6 +43,15 @@ public class Bullet : MonoBehaviour
     {
         if (col.gameObject.CompareTag("Enemy")) return;
         if (col.gameObject.CompareTag("Bullet")) return;
+
+        // ✅ กรณี Bullet เป็น non-trigger
+        if (col.gameObject.CompareTag("Player"))
+        {
+            Player player = col.gameObject.GetComponent<Player>();
+            if (player != null)
+                player.TakeDamage(player.GetCurrentHealth());
+        }
+
         Destroy(gameObject);
     }
 }

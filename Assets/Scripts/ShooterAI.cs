@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Audio;
 
 public class ShooterAI : MonoBehaviour
 {
@@ -11,10 +12,19 @@ public class ShooterAI : MonoBehaviour
     [Header("Facing")]
     public float facingDirection = 1f;
 
+    [Header("Sound - Shoot")]
+    public AudioClip shootClip;
+    [Range(0f, 1f)] public float shootVolume = 1f;
+    public AudioMixerGroup sfxMixerGroup;
+    public float soundMinDistance = 2f;
+    public float soundMaxDistance = 10f;
+
     private float fireTimer = 0f;
     private float dir;
     private EnemyContact enemyContact;
     private Animator animator;
+    private AudioSource sfxSource;
+    private Transform audioChildTransform;
 
     void Start()
     {
@@ -23,6 +33,22 @@ public class ShooterAI : MonoBehaviour
         animator = GetComponent<Animator>();
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
+
+        // สร้าง child GameObject แยกสำหรับ AudioSource
+        // parent (enemy) จะไม่ถูกขยับเลย
+        GameObject audioChild = new GameObject("ShooterSFX");
+        audioChild.transform.SetParent(transform);
+        audioChild.transform.localPosition = Vector3.zero;
+        audioChildTransform = audioChild.transform;
+
+        sfxSource = audioChild.AddComponent<AudioSource>();
+        sfxSource.playOnAwake = false;
+        sfxSource.spatialBlend = 1f;
+        sfxSource.rolloffMode = AudioRolloffMode.Linear;
+        sfxSource.minDistance = soundMinDistance;
+        sfxSource.maxDistance = soundMaxDistance;
+        if (sfxMixerGroup != null)
+            sfxSource.outputAudioMixerGroup = sfxMixerGroup;
     }
 
     void Update()
@@ -42,11 +68,22 @@ public class ShooterAI : MonoBehaviour
         {
             if (animator != null)
                 animator.SetBool("isShooting", true);
-
             fireTimer = 0f;
         }
     }
 
+    void LateUpdate()
+    {
+        // ขยับแค่ child AudioSource ให้ Z ตรงกับ Camera
+        // parent (enemy) ไม่ถูกแตะเลย ดังนั้น enemy ยังแสดงผลปกติ
+        if (audioChildTransform == null || Camera.main == null) return;
+
+        audioChildTransform.position = new Vector3(
+            transform.position.x,
+            transform.position.y,
+            Camera.main.transform.position.z
+        );
+    }
 
     // เรียกจาก Animation Event ตรงเฟรมที่ยิง
     public void SpawnBullet()
@@ -55,10 +92,14 @@ public class ShooterAI : MonoBehaviour
         if (enemyContact != null && enemyContact.isDead) return;
 
         if (animator != null)
-            animator.SetBool("isShooting", false); // ปิดหลังยิง
+            animator.SetBool("isShooting", false);
 
         GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
         bullet.GetComponent<Bullet>().Init(dir > 0 ? 1 : -1, shootRange);
+
+        // 🔊 เสียงยิง
+        if (shootClip != null)
+            sfxSource.PlayOneShot(shootClip, shootVolume);
     }
 
     void OnDrawGizmos()
